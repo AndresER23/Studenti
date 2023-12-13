@@ -5,26 +5,29 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import Header from "../../components/header";
 import TasksProgress from "../../components/tasksProgress";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import TodayTask from "../../components/todayTask";
+import AddOptionsSheet from "../../components/addOptions";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 const Index = ({ navigation }) => {
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const openModal = () => {
+    bottomSheetRef.current.present();
+  };
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.customHeader}>
         <Header />
       </SafeAreaView>
+      <AddOptionsSheet ref={bottomSheetRef} navigator={navigation} />
       <TasksProgress />
       <TodayTask />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("AddTask")}
-      >
-        <Text style={styles.buttonText}>Add new text</Text>
-        <Ionicons name="add-outline" color={"#fff"} size={20} />
+      <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
+        <Ionicons name="add-circle-outline" color={"#3168e0"} size={60} />
       </TouchableOpacity>
     </View>
   );
@@ -35,19 +38,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#171719",
     justifyContent: "space-around",
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     paddingVertical: 40,
   },
   customHeader: {},
   addButton: {
-    backgroundColor: "#3168e0",
-    borderRadius: 5,
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 70,
-    gap: 5,
+    position: "absolute",
+    bottom: 120,
+    right: 30,
   },
   buttonText: {
     color: "#fff",

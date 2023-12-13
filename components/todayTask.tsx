@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#232229",
     padding: 30,
     borderRadius: 20,
+    marginBottom: 20,
   },
   image: {
     width: 300,

@@ -1,0 +1,5 @@
+export default colors = {
+  backgroundColor: "#171719",
+  secondaryBackgroundColor: "#232229",
+  primaryColor: "#3168e0",
+};
