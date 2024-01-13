@@ -4,54 +4,82 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import colors from "../../commons/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const AddTask = () => {
-  const [status, setStatus] = useState("Medium");
+const AddTask = ({ navigation }) => {
+  const [taskTitle, setTaskTitle] = useState<String>();
+  const [priority, setPriority] = useState<String>("Medium");
+  const [members, setMembers] = useState([]);
+  const [membersLenght, setMembersLenght] = useState(0);
+  const [location, setLocation] = useState();
+  const [description, setDescription] = useState<String>();
+  const membersRef = useRef(null);
+
+  function handleMembers(member: string) {
+    if (member == "") {
+      Alert.alert("Debe incluir un nombre");
+    } else if (members.indexOf(member.trim()) != -1) {
+      Alert.alert("Este miembro ya existe");
+    } else {
+      members.push(member);
+    }
+
+    setMembersLenght(members.length);
+    membersRef.current.clear();
+  }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={styles.container}
+      resetScrollToCoords={{ x: 0, y: 0 }}
+      scrollEnabled={false}
+      extraHeight={200}
+    >
       <View style={styles.section}>
         <Text style={styles.title}>Title</Text>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setTaskTitle(text)}
+          />
           <Ionicons name="pencil-outline" size={18} style={styles.icon} />
         </View>
       </View>
-      <View style={styles.sectionDual}>
-        <View style={styles.dualContainer}>
-          <Text style={styles.title}>Due date</Text>
-          <View style={styles.inputContainer}>
-            <TextInput style={styles.input} />
-            <Ionicons name="calendar-outline" size={18} style={styles.icon} />
-          </View>
-        </View>
-        <View style={styles.dualContainer}>
-          <Text style={styles.title}>Due date</Text>
-          <View style={styles.inputContainer}>
-            <TextInput style={styles.input} />
-            <Ionicons name="timer-outline" size={18} style={styles.icon} />
-          </View>
+      <View style={styles.section}>
+        <Text style={styles.title}>Due date</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="dd/mm/yyyy"
+            placeholderTextColor={colors.placeHolderColor}
+          />
+          <Ionicons name="calendar-outline" size={18} style={styles.icon} />
         </View>
       </View>
       <View style={styles.section}>
         <Text style={styles.title}>Priority</Text>
         <View style={styles.priorityContainer}>
           <TouchableOpacity
-            onPress={() => setStatus("Low")}
+            onPress={() => setPriority("Low")}
             style={
-              status == "Low" ? styles.activePriority : styles.inactivePriority
+              priority == "Low"
+                ? styles.activePriority
+                : styles.inactivePriority
             }
           >
             <Text style={styles.priorityText}>Low</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setStatus("Medium")}
+            onPress={() => setPriority("Medium")}
             style={
-              status == "Medium"
+              priority == "Medium"
                 ? styles.activePriority
                 : styles.inactivePriority
             }
@@ -59,9 +87,11 @@ const AddTask = () => {
             <Text style={styles.priorityText}>Medium</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setStatus("High")}
+            onPress={() => setPriority("High")}
             style={
-              status == "High" ? styles.activePriority : styles.inactivePriority
+              priority == "High"
+                ? styles.activePriority
+                : styles.inactivePriority
             }
           >
             <Text style={styles.priorityText}>High</Text>
@@ -71,15 +101,13 @@ const AddTask = () => {
       <View style={styles.section}>
         <Text style={styles.title}>Members</Text>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} />
+          <TextInput
+            style={styles.input}
+            ref={membersRef}
+            onEndEditing={(member) => handleMembers(member.nativeEvent.text)}
+          />
           <Ionicons name="person-add-outline" size={18} style={styles.icon} />
-        </View>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.title}>Location</Text>
-        <View style={styles.inputContainer}>
-          <TextInput style={styles.input} />
-          <Ionicons name="location-outline" size={18} style={styles.icon} />
+          <Text style={styles.members}>{membersLenght}</Text>
         </View>
       </View>
       <View style={styles.section}>
@@ -89,7 +117,12 @@ const AddTask = () => {
           <Ionicons name="receipt-outline" size={18} style={styles.icon} />
         </View>
       </View>
-    </View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Save task</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -98,8 +131,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.backgroundColor,
     paddingHorizontal: 25,
-    paddingVertical: 20,
-    justifyContent: "space-around",
+    paddingTop: 30,
+    paddingBottom: 60,
+    justifyContent: "space-between",
   },
   input: {
     backgroundColor: colors.secondaryBackgroundColor,
@@ -119,20 +153,12 @@ const styles = StyleSheet.create({
   section: {
     gap: 10,
   },
-  sectionDual: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    gap: 10,
-  },
-  dualContainer: {
-    flex: 1,
-  },
   icon: {
     right: 40,
     color: "#fff",
   },
   inputContainer: {
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -162,6 +188,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 10,
+  },
+  button: {
+    backgroundColor: colors.primaryColor,
+    borderRadius: 10,
+    justifyContent: "center",
+    padding: 15,
+    marginTop: 5,
+    flex: 1,
+  },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 17,
+  },
+  members: {
+    color: "#fff",
+    right: 25,
+    fontSize: 10,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  attachContainer: {
+    flex: 0.3,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
