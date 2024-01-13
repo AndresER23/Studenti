@@ -8,10 +8,13 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import colors from "../../commons/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import CalendarSheetModal from "../../components/calendarSheetModal";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { DateData } from "react-native-calendars";
 
 const AddTask = ({ navigation }) => {
   const [taskTitle, setTaskTitle] = useState<String>();
@@ -20,7 +23,9 @@ const AddTask = ({ navigation }) => {
   const [membersLenght, setMembersLenght] = useState(0);
   const [location, setLocation] = useState();
   const [description, setDescription] = useState<String>();
+  const [date, setDate] = useState<DateData>();
   const membersRef = useRef(null);
+  const calendarRef = useRef<BottomSheetModal>();
 
   function handleMembers(member: string) {
     if (member == "") {
@@ -33,6 +38,10 @@ const AddTask = ({ navigation }) => {
 
     setMembersLenght(members.length);
     membersRef.current.clear();
+  }
+
+  function handleCalendar() {
+    calendarRef.current.present();
   }
 
   return (
@@ -59,8 +68,14 @@ const AddTask = ({ navigation }) => {
             style={styles.input}
             placeholder="dd/mm/yyyy"
             placeholderTextColor={colors.placeHolderColor}
+            value={date ? date.dateString : ""}
           />
-          <Ionicons name="calendar-outline" size={18} style={styles.icon} />
+          <Ionicons
+            name="calendar-outline"
+            size={18}
+            style={styles.icon}
+            onPress={handleCalendar}
+          />
         </View>
       </View>
       <View style={styles.section}>
@@ -106,7 +121,12 @@ const AddTask = ({ navigation }) => {
             ref={membersRef}
             onEndEditing={(member) => handleMembers(member.nativeEvent.text)}
           />
-          <Ionicons name="person-add-outline" size={18} style={styles.icon} />
+          <Ionicons
+            name="person-add-outline"
+            size={18}
+            style={styles.icon}
+            onLongPress={() => Alert.alert("Nombres")}
+          />
           <Text style={styles.members}>{membersLenght}</Text>
         </View>
       </View>
@@ -122,6 +142,11 @@ const AddTask = ({ navigation }) => {
           <Text style={styles.buttonText}>Save task</Text>
         </TouchableOpacity>
       </View>
+      <CalendarSheetModal
+        ref={calendarRef}
+        navigator={navigation}
+        setDate={setDate}
+      />
     </KeyboardAwareScrollView>
   );
 };
