@@ -15,6 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import CalendarSheetModal from "../../components/calendarSheetModal";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { DateData } from "react-native-calendars";
+import MembersSheetModal from "../../components/membersSheetModal";
 
 const AddTask = ({ navigation }) => {
   const [taskTitle, setTaskTitle] = useState<String>();
@@ -25,11 +26,19 @@ const AddTask = ({ navigation }) => {
   const [description, setDescription] = useState<String>();
   const [date, setDate] = useState<DateData>();
   const membersRef = useRef(null);
+  const membersModal = useRef(null);
   const calendarRef = useRef<BottomSheetModal>();
 
   function handleMembers(member: string) {
+    const reg = new RegExp(
+      "^([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ']+[s])+([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ'])+[s]?([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúÁÉÍÓÚñáéíóúÑ'])?$"
+    );
     if (member == "") {
-      Alert.alert("Debe incluir un nombre");
+      return;
+    } else if (reg.test(member)) {
+      Alert.alert(
+        "El nombre no debe contener numeros ni caracteres especiales"
+      );
     } else if (members.indexOf(member.trim()) != -1) {
       Alert.alert("Este miembro ya existe");
     } else {
@@ -42,6 +51,10 @@ const AddTask = ({ navigation }) => {
 
   function handleCalendar() {
     calendarRef.current.present();
+  }
+
+  function handleMembersModal() {
+    members.length > 0 && membersModal.current.present();
   }
 
   return (
@@ -125,7 +138,7 @@ const AddTask = ({ navigation }) => {
             name="person-add-outline"
             size={18}
             style={styles.icon}
-            onLongPress={() => Alert.alert("Nombres")}
+            onPress={handleMembersModal}
           />
           <Text style={styles.members}>{membersLenght}</Text>
         </View>
@@ -146,6 +159,11 @@ const AddTask = ({ navigation }) => {
         ref={calendarRef}
         navigator={navigation}
         setDate={setDate}
+      />
+      <MembersSheetModal
+        navigator={navigation}
+        ref={membersModal}
+        members={members}
       />
     </KeyboardAwareScrollView>
   );
