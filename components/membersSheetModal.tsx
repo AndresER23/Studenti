@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { forwardRef, useMemo, useCallback } from "react";
+import React, { forwardRef, useMemo, useCallback, useState, SetStateAction, Dispatch } from "react";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -14,11 +14,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 interface Navigator {
   navigator: any;
 }
-interface CalendarSheetModalProps {
+interface MembersSheetModalProps {
   members: Array<String>;
+  setMembers: Dispatch<SetStateAction<any[]>>
+  setMembersLenght: Dispatch<SetStateAction<number>>
 }
 
-const MembersSheetModal = forwardRef<Ref, Navigator & CalendarSheetModalProps>(
+const MembersSheetModal = forwardRef<Ref, Navigator & MembersSheetModalProps>(
   (props, reference) => {
     const snapPoints = useMemo(() => ["35%"], []);
     const renderBackDrop = useCallback(
@@ -32,13 +34,16 @@ const MembersSheetModal = forwardRef<Ref, Navigator & CalendarSheetModalProps>(
       []
     );
     const { dismiss } = useBottomSheetModal();
-    const { members } = props;
+    const { members, setMembers, setMembersLenght } = props;
+    const [membersState, setMemberState] = useState(members)
 
-    let NumColumns = 1;
-    if (members.length > 6) {
-      NumColumns = 2;
-    } else if (members.length > 12) {
-      NumColumns = 3;
+    function handleRemoveMember(item: String) {
+      console.log(item);
+
+      let filteredMembers = membersState.filter(member => member != item)
+      setMemberState(filteredMembers)
+      setMembers(filteredMembers)
+      setMembersLenght(filteredMembers.length)
     }
     return (
       <BottomSheetModal
@@ -53,58 +58,61 @@ const MembersSheetModal = forwardRef<Ref, Navigator & CalendarSheetModalProps>(
           height: 35,
         }}
       >
-        <View style={styles.container}>
-          <FlatList
-            data={members}
-            numColumns={1}
-            style={{
-              flex: 1,
-              gap: 20,
-            }}
-            contentContainerStyle={{
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-            renderItem={(item) => {
-              return (
-                <View key={item.index} style={styles.textContainer}>
-                  <Text>{item.index + 1}.</Text>
-                  <Text style={styles.text}>{item.item}</Text>
+        <FlatList
+          data={membersState}
+          numColumns={1}
+          style={{
+            flex: 1,
+            backgroundColor: colors.backgroundColor
+          }}
+          contentContainerStyle={{
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+          renderItem={(item) => {
+            return (
+              <View key={item.index} style={styles.textContainer}>
+                <View>
+                  <Text style={{ color: colors.primaryColor }} >{item.index + 1}.</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 15, fontWeight: "400", color: "#fff" }}>{item.item}</Text>
+                </View>
+                <TouchableOpacity onPress={() => handleRemoveMember(item.item)}>
                   <Ionicons
                     name="person-remove-outline"
                     size={18}
                     style={styles.icon}
                   />
-                </View>
-              );
-            }}
-          />
-        </View>
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+        />
       </BottomSheetModal>
     );
   }
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.backgroundColor,
-    paddingHorizontal: 20,
-  },
   textContainer: {
-    backgroundColor: "yellow",
-    width: "100%",
+    width: 350,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginVertical: 13,
+    backgroundColor: colors.secondaryBackgroundColor,
     paddingVertical: 10,
     flexDirection: "row",
     justifyContent: "space-between",
+    borderRadius: 10
+
   },
   text: {
     color: "#fff",
   },
   icon: {
     color: "red",
-    right: 5,
-    backgroundColor: "red",
   },
 });
 

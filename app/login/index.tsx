@@ -27,7 +27,7 @@ const Index = ({ navigation }) => {
       <TasksProgress />
       <TodayTask />
       <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
-        <Ionicons name="add-circle-outline" color={"#3168e0"} size={60} />
+        <Ionicons name="add-circle-outline" color={"#3168e0"} size={80} />
       </TouchableOpacity>
     </View>
   );
@@ -43,9 +43,9 @@ const styles = StyleSheet.create({
   },
   customHeader: {},
   addButton: {
-    position: "absolute",
-    bottom: 120,
-    right: 30,
+    position: 'absolute',
+    bottom: 15,
+    right: 10
   },
   buttonText: {
     color: "#fff",

@@ -5,10 +5,23 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as Progress from "react-native-progress";
+import { GetProgress } from "../commons/getters";
+import colors from "../commons/colors";
+
 
 const TasksProgress = () => {
+  const [taskStats, setTaskStats] = useState();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await GetProgress()
+      setTaskStats(data)
+    }
+    fetchData()
+  }, []);
+
   const monthNames = [
     "January",
     "February",
@@ -23,32 +36,21 @@ const TasksProgress = () => {
     "November",
     "December",
   ];
+
   const currentDate = new Date();
   let month = currentDate.getMonth();
   let day = currentDate.getDate();
 
-  let data = [
-    { subject: "Calculo 1", progress: 0.2, advance: "4/20" },
-    {
-      subject: "Programación 2",
-      progress: 0.54,
-      advance: "16/20",
-    },
-    {
-      subject: "Estadistica",
-      progress: 0.9,
-      advance: "19/20",
-    },
-  ];
-
   interface data {
-    subject: string;
-    progress: number;
-    advance: string;
+    subject_name: string;
+    progress: any;
+    completly_tasks: number;
+    total_tasks: number;
   }
 
   const renderItem = (item: data) => {
-    let { subject, advance, progress } = item;
+    let { subject_name, completly_tasks, total_tasks, progress } = item;
+    progress = Number(progress)
 
     let color: string;
 
@@ -60,37 +62,47 @@ const TasksProgress = () => {
       <View style={styles.renderContainer}>
         <View style={styles.textContainer}>
           <View>
-            <Text style={styles.title}>{subject}</Text>
-            <Text style={styles.subtitle}>{advance}</Text>
+            <Text style={styles.title}>{subject_name}</Text>
+            {total_tasks != 0 ? <Text style={styles.subtitle}>{`${completly_tasks}/${total_tasks}`}</Text> : <Text style={{ color: colors.primaryColor, textAlign: 'center', fontWeight: 700, paddingTop: 5 }}>Sin tareas!</Text>}
           </View>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>
-              {monthNames[month].substring(0, 5)} {day}
-            </Text>
-          </TouchableOpacity>
+          {
+            total_tasks != 0 && (
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>
+                  {monthNames[month].substring(0, 5)} {day}
+                </Text>
+              </TouchableOpacity>
+            )
+          }
         </View>
-        <View>
-          <Progress.Circle
-            size={100}
-            indeterminate={false}
-            progress={item.progress}
-            textStyle={styles.pieText}
-            borderWidth={0}
-            unfilledColor="#474747"
-            thickness={9}
-            strokeCap="round"
-            color={color}
-            showsText={true}
-            animated={false}
-          />
-        </View>
+        {
+          total_tasks != 0 ? (
+            <View>
+              <Progress.Circle
+                size={100}
+                indeterminate={false}
+                progress={progress}
+                textStyle={styles.pieText}
+                borderWidth={0}
+                unfilledColor="#474747"
+                thickness={9}
+                strokeCap="round"
+                color={color}
+                showsText={true}
+                animated={false}
+              />
+            </View>
+          ) : (<View>
+            <Text style={{ fontSize: 20, right: 40 }}>🎉✨🎆</Text>
+          </View>)
+        }
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <FlatList data={data} renderItem={({ item }) => renderItem(item)} />
+      <FlatList data={taskStats} renderItem={({ item }) => renderItem(item)} />
     </View>
   );
 };
