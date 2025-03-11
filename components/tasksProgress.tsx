@@ -11,16 +11,7 @@ import { GetProgress } from "../commons/getters";
 import colors from "../commons/colors";
 
 
-const TasksProgress = () => {
-  const [taskStats, setTaskStats] = useState();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await GetProgress()
-      setTaskStats(data)
-    }
-    fetchData()
-  }, []);
+const TasksProgress = ({ taskStats }) => {
 
   const monthNames = [
     "January",

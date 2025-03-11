@@ -5,27 +5,44 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Header from "../../components/header";
 import TasksProgress from "../../components/tasksProgress";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import TodayTask from "../../components/todayTask";
 import AddOptionsSheet from "../../components/addOptions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useState } from "react";
+import { GetProgress } from "../../commons/getters";
 
 const Index = ({ navigation }) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const openModal = () => {
     bottomSheetRef.current.present();
   };
+  const [searching, setSearching] = useState(false);
+  const [taskStats, setTaskStats] = useState();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await GetProgress();
+        setTaskStats(data);
+      } catch (error) {
+        console.error("Error fetching progress:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.customHeader}>
-        <Header />
+      <SafeAreaView style={!searching ? styles.customHeader : styles.searching}>
+        <Header searching={searching} setSearching={setSearching} />
       </SafeAreaView>
       <AddOptionsSheet ref={bottomSheetRef} navigator={navigation} />
-      <TasksProgress />
-      <TodayTask />
+      {!searching && <TasksProgress taskStats={taskStats} />}
+      {!searching && <TodayTask />}
       <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
         <Ionicons name="add-circle-outline" color={"#3168e0"} size={80} />
       </TouchableOpacity>
@@ -41,7 +58,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 40,
   },
-  customHeader: {},
+  customHeader: {
+
+  },
+  searching: {
+    width: '100%',
+    position: 'absolute',
+    top: 20,
+    display: 'flex',
+    left: 20
+  },
   addButton: {
     position: 'absolute',
     bottom: 15,

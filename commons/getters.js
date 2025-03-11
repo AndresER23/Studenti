@@ -27,6 +27,7 @@ export function GetProgress() {
   return fetch(GET_PROGRESS_URL)
     .then(res => res.json())
     .then(res => {
+      console.log('Holaaaaaaaa');
       console.log(res);
       return res
     })
