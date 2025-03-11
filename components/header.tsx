@@ -2,7 +2,7 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Header = () => {
+const Header = ({ searching, setSearching }) => {
   return (
     <View style={styles.container}>
       <View style={styles.titles}>
@@ -14,6 +14,8 @@ const Header = () => {
           style={styles.input}
           placeholder="Search Task"
           placeholderTextColor={"#828282"}
+          onFocus={() => setSearching(true)}
+          onBlur={() => setSearching(false)}
         />
         <Ionicons
           name="search-outline"
