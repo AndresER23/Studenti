@@ -1,4 +1,4 @@
-import { GET_TASKS_URL, GET_SUBJECTS_URL, GET_PROGRESS_URL } from './contansts'
+import { GET_TASKS_URL, GET_SUBJECTS_URL, GET_PROGRESS_URL } from './constans'
 
 export function GetTasks() {
   return fetch(GET_TASKS_URL)
