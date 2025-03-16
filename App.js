@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import colors from "./commons/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native";
+import { TaskProvider } from "./context/taskContext";
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -18,45 +19,47 @@ export default function App() {
     <NavigationContainer>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Home"
-              component={Index}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="AddTask"
-              component={AddTask}
-              options={{
-                presentation: "card",
-                title: "Add a new task",
-                headerStyle: {
-                  backgroundColor: colors.backgroundColor,
-                  height: 100,
-                },
-                headerTitleStyle: { color: "#fff" },
-                headerBackTitleStyle: { color: colors.primaryColor },
-                headerBackImage: () => (
-                  <Ionicons
-                    name="chevron-back-outline"
-                    size={20}
-                    color={colors.primaryColor}
-                  />
-                ),
-                headerRight: () => (
-                  <TouchableOpacity>
+          <TaskProvider>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Home"
+                component={Index}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="AddTask"
+                component={AddTask}
+                options={{
+                  presentation: "card",
+                  title: "Add a new task",
+                  headerStyle: {
+                    backgroundColor: colors.backgroundColor,
+                    height: 100,
+                  },
+                  headerTitleStyle: { color: "#fff" },
+                  headerBackTitleStyle: { color: colors.primaryColor },
+                  headerBackImage: () => (
                     <Ionicons
-                      name="document-attach-outline"
-                      size={30}
-                      style={{ color: colors.primaryColor, right: 25 }}
+                      name="chevron-back-outline"
+                      size={20}
+                      color={colors.primaryColor}
                     />
-                  </TouchableOpacity>
-                ),
-              }}
-            />
-          </Stack.Navigator>
+                  ),
+                  headerRight: () => (
+                    <TouchableOpacity>
+                      <Ionicons
+                        name="document-attach-outline"
+                        size={30}
+                        style={{ color: colors.primaryColor, right: 25 }}
+                      />
+                    </TouchableOpacity>
+                  ),
+                }}
+              />
+            </Stack.Navigator>
+          </TaskProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </NavigationContainer>

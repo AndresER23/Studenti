@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useContext } from "react";
 import colors from "../../commons/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -14,14 +14,14 @@ import CalendarSheetModal from "../../components/calendarSheetModal";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { DateData } from "react-native-calendars";
 import MembersSheetModal from "../../components/membersSheetModal";
-import { GetSubjects } from "../../commons/getters";
 import SheetModal from "../../components/SheetModal";
 import { FlatList } from "react-native-gesture-handler";
-import { CREATE_TASK_URL } from "../../commons/contansts";
+import { TaskContext } from "../../context/taskContext";
+import { createNewTask } from "../../commons/api";
 
 
 const AddTask = ({ navigation }) => {
-  const [taskTitle, setTaskTitle] = useState<String>("");
+  const [taskTitle, setTaskTitle] = useState<string>("");
   const [priority, setPriority] = useState<String>("Medium");
   const [members, setMembers] = useState([]);
   const [membersLenght, setMembersLenght] = useState(0);
@@ -30,30 +30,13 @@ const AddTask = ({ navigation }) => {
   const membersRef = useRef(null);
   const membersModal = useRef(null);
   const calendarRef = useRef<BottomSheetModal>(null);
-  const [subjects, setSubjects] = useState([]);
   const subjectsModal = useRef<BottomSheetModal>(null)
   const [selectedSubject, setSelectedSubject] = useState();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await GetSubjects()
-      setSubjects(data)
-    }
-
-    fetchData()
-
-  }, []);
-
+  const { taskStats, fetchTasks } = useContext(TaskContext);
+  
   function handleMembers(member: string) {
-    const reg = new RegExp(
-      "^([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ']+[s])+([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ'])+[s]?([A-Za-záéíóúñÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-záéíóúÁÉÍÓÚñáéíóúÑ'])?$"
-    );
     if (member == "") {
       return;
-    } else if (reg.test(member)) {
-      Alert.alert(
-        "El nombre no debe contener numeros ni caracteres especiales"
-      );
     } else if (members.indexOf(member.trim()) != -1) {
       Alert.alert("Este miembro ya existe");
     } else {
@@ -75,8 +58,9 @@ const AddTask = ({ navigation }) => {
   function handleSubjectModal() {
     subjectsModal.current.present();
   }
+  
 
-  function saveTask() {
+  async function saveTask() {
 
     if (!taskTitle || !priority || !date || !selectedSubject) {
       return Alert.alert("Ingrese todos los datos")
@@ -92,31 +76,28 @@ const AddTask = ({ navigation }) => {
       selectedSubject
     }
 
-    fetch(CREATE_TASK_URL, {
-      method: 'POST', headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(res => res.json()).then(res => {
-      navigation.goBack()
-      Alert.alert("Tarea guardada")
-    }
-    ).catch(error => console.log(error.message)
-    )
+    console.log('cola');
 
+    try {
+      const result = await createNewTask(data, fetchTasks, navigation);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function renderSubject({ item }) {
-    let { name, subject_id } = item
+    console.log(item);
+    let { subject_name, subject_id } = item
 
     let icons = { "Cálculo": "calculator-outline", "Programación": "code-outline" }
     return (
       <TouchableOpacity key={subject_id} style={styles.subjectsContainer} onPress={() => {
         setSelectedSubject(subject_id)
+        setTaskTitle(subject_name)
         subjectsModal.current.close()
       }}>
-        <Ionicons name={icons[name]} style={{ left: 10 }} size={20} />
-        <Text style={{ fontWeight: "600" }}>{name}</Text>
+        <Ionicons name={icons[subject_name]} style={{ left: 10 }} size={20} />
+        <Text style={{ fontWeight: "600" }}>{subject_name}</Text>
         <View></View>
       </TouchableOpacity>
     )
@@ -126,20 +107,23 @@ const AddTask = ({ navigation }) => {
     <KeyboardAwareScrollView
       contentContainerStyle={styles.container}
       resetScrollToCoords={{ x: 0, y: 0 }}
-      scrollEnabled={false}
-      extraHeight={200}
+      scrollEnabled={true}
+      extraHeight={400}
+      extraScrollHeight={50}
     >
       <View style={styles.section}>
         <Text style={styles.title}>Title</Text>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
+            value={taskTitle ? taskTitle : ""}
+
             onChangeText={(text) => setTaskTitle(text)}
           />
           <TouchableOpacity
             onPress={handleSubjectModal}
           >
-            <Ionicons name="pencil-outline" size={18} style={styles.icon} />
+            <Ionicons name="pencil-outline" size={30} style={styles.icon} />
           </TouchableOpacity>
         </View>
       </View>
@@ -154,7 +138,7 @@ const AddTask = ({ navigation }) => {
           />
           <Ionicons
             name="calendar-outline"
-            size={18}
+            size={30}
             style={styles.icon}
             onPress={handleCalendar}
           />
@@ -205,8 +189,8 @@ const AddTask = ({ navigation }) => {
           />
           <Ionicons
             name="person-add-outline"
-            size={18}
-            style={styles.icon}
+            size={30}
+            style={{ right: 60, color: '#fff' }}
             onPress={handleMembersModal}
           />
           <Text style={styles.members}>{membersLenght}</Text>
@@ -216,7 +200,7 @@ const AddTask = ({ navigation }) => {
         <Text style={styles.title}>Description</Text>
         <View style={styles.inputContainer}>
           <TextInput onEndEditing={(event) => setDescription(event.nativeEvent.text)} style={styles.input} />
-          <Ionicons name="receipt-outline" size={18} style={styles.icon} />
+          <Ionicons name="receipt-outline" size={30} style={styles.icon} />
         </View>
       </View>
       <View style={styles.footer}>
@@ -245,7 +229,7 @@ const AddTask = ({ navigation }) => {
         }}
 
       >{
-          <FlatList data={subjects} renderItem={renderSubject} style={styles.flatListSubjects} />
+          <FlatList data={taskStats} renderItem={renderSubject} style={styles.flatListSubjects} />
         }</SheetModal>
     </KeyboardAwareScrollView>
   );
@@ -329,7 +313,7 @@ const styles = StyleSheet.create({
   },
   members: {
     color: "#fff",
-    right: 25,
+    right: 50,
     fontSize: 10,
   },
   footer: {

@@ -12,8 +12,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import TodayTask from "../../components/todayTask";
 import AddOptionsSheet from "../../components/addOptions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useState } from "react";
-import { GetProgress } from "../../commons/getters";
+import { useState, useContext } from "react";
+import { TaskContext } from "../../context/taskContext";
 
 const Index = ({ navigation }) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -21,19 +21,7 @@ const Index = ({ navigation }) => {
     bottomSheetRef.current.present();
   };
   const [searching, setSearching] = useState(false);
-  const [taskStats, setTaskStats] = useState();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await GetProgress();
-        setTaskStats(data);
-      } catch (error) {
-        console.error("Error fetching progress:", error);
-      }
-    };
-    fetchData();
-  }, []);
+  const { taskStats } = useContext(TaskContext);
 
   return (
     <View style={styles.container}>
@@ -44,7 +32,7 @@ const Index = ({ navigation }) => {
       {!searching && <TasksProgress taskStats={taskStats} />}
       {!searching && <TodayTask />}
       <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
-        <Ionicons name="add-circle-outline" color={"#3168e0"} size={80} />
+        <Ionicons name="add-circle-outline" color={"#3168e0"} size={65} />
       </TouchableOpacity>
     </View>
   );
