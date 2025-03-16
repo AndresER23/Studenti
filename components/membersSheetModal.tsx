@@ -38,7 +38,6 @@ const MembersSheetModal = forwardRef<Ref, Navigator & MembersSheetModalProps>(
     const [membersState, setMemberState] = useState(members)
 
     function handleRemoveMember(item: String) {
-      console.log(item);
 
       let filteredMembers = membersState.filter(member => member != item)
       setMemberState(filteredMembers)
