@@ -16,7 +16,7 @@ import { DateData } from "react-native-calendars";
 import MembersSheetModal from "../../components/membersSheetModal";
 import SheetModal from "../../components/SheetModal";
 import { FlatList } from "react-native-gesture-handler";
-import { TaskContext } from "../../context/taskContext";
+import { SubjectContext } from "../../context/subjectContext";
 import { createNewTask } from "../../commons/api";
 
 
@@ -32,8 +32,9 @@ const AddTask = ({ navigation }) => {
   const calendarRef = useRef<BottomSheetModal>(null);
   const subjectsModal = useRef<BottomSheetModal>(null)
   const [selectedSubject, setSelectedSubject] = useState();
-  const { taskStats, fetchTasks } = useContext(TaskContext);
-  
+  const { subjectStats, fetchSubjects } = useContext(SubjectContext);
+
+
   function handleMembers(member: string) {
     if (member == "") {
       return;
@@ -58,7 +59,7 @@ const AddTask = ({ navigation }) => {
   function handleSubjectModal() {
     subjectsModal.current.present();
   }
-  
+
 
   async function saveTask() {
 
@@ -76,17 +77,14 @@ const AddTask = ({ navigation }) => {
       selectedSubject
     }
 
-    console.log('cola');
-
     try {
-      const result = await createNewTask(data, fetchTasks, navigation);
+      const result = await createNewTask(data, fetchSubjects, navigation);
     } catch (error) {
       console.log(error);
     }
   }
 
   function renderSubject({ item }) {
-    console.log(item);
     let { subject_name, subject_id } = item
 
     let icons = { "Cálculo": "calculator-outline", "Programación": "code-outline" }
@@ -229,7 +227,7 @@ const AddTask = ({ navigation }) => {
         }}
 
       >{
-          <FlatList data={taskStats} renderItem={renderSubject} style={styles.flatListSubjects} />
+          <FlatList data={subjectStats} renderItem={renderSubject} style={styles.flatListSubjects} />
         }</SheetModal>
     </KeyboardAwareScrollView>
   );

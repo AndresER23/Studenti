@@ -11,7 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import colors from "./commons/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native";
-import { TaskProvider } from "./context/taskContext";
+import { AppProvider } from "./context/appProvider";
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -19,7 +19,7 @@ export default function App() {
     <NavigationContainer>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
-          <TaskProvider>
+          <AppProvider>
             <Stack.Navigator>
               <Stack.Screen
                 name="Home"
@@ -59,7 +59,7 @@ export default function App() {
                 }}
               />
             </Stack.Navigator>
-          </TaskProvider>
+          </AppProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </NavigationContainer>

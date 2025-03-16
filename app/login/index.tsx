@@ -13,7 +13,7 @@ import TodayTask from "../../components/todayTask";
 import AddOptionsSheet from "../../components/addOptions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useState, useContext } from "react";
-import { TaskContext } from "../../context/taskContext";
+import { SubjectContext } from "../../context/subjectContext";
 
 const Index = ({ navigation }) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -21,7 +21,7 @@ const Index = ({ navigation }) => {
     bottomSheetRef.current.present();
   };
   const [searching, setSearching] = useState(false);
-  const { taskStats } = useContext(TaskContext);
+  const { subjectStats } = useContext(SubjectContext);
 
   return (
     <View style={styles.container}>
@@ -29,7 +29,7 @@ const Index = ({ navigation }) => {
         <Header searching={searching} setSearching={setSearching} />
       </SafeAreaView>
       <AddOptionsSheet ref={bottomSheetRef} navigator={navigation} />
-      {!searching && <TasksProgress taskStats={taskStats} />}
+      {!searching && <TasksProgress taskStats={subjectStats} />}
       {!searching && <TodayTask />}
       <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
         <Ionicons name="add-circle-outline" color={"#3168e0"} size={65} />
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingHorizontal: 20,
     paddingVertical: 40,
+    gap: 40
   },
   customHeader: {
 

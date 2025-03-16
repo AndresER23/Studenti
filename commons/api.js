@@ -1,6 +1,6 @@
 import { CREATE_TASK_URL } from "./constans"
 
-export async function createNewTask(data, fetchTasks, navigation) {
+export async function createNewTask(data, fetchSubjects, navigation) {
     try {
         const res = await fetch(CREATE_TASK_URL, {
             method: 'POST',
@@ -10,8 +10,7 @@ export async function createNewTask(data, fetchTasks, navigation) {
 
         const result = await res.json();
 
-        fetchTasks();
-        console.log('gola');
+        fetchSubjects();
 
         navigation.goBack();
         alert("Tarea guardada");

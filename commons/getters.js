@@ -15,7 +15,6 @@ export function GetSubjects() {
   return fetch(GET_SUBJECTS_URL)
     .then(res => res.json())
     .then(data => {
-      console.log(data);
       return data; // Aseguramos de retornar los datos
     })
     .catch(error => {
@@ -27,8 +26,7 @@ export function GetProgress() {
   return fetch(GET_PROGRESS_URL)
     .then(res => res.json())
     .then(res => {
-      console.log('Holaaaaaaaa');
-      console.log(res);
       return res
-    })
+    }).catch(err => console.log('Error en la consulta')
+    )
 }
